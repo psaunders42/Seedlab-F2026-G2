@@ -1,0 +1,12 @@
+#Mini Project
+
+#Project Description
+
+This project integrates a two-wheel motor control system with a computer vision interface using a Raspberry Pi and Arduino. 
+A camera detects the position of a visual marker within four image quadrants, and the marker location is used to command independent 
+target positions for the left and right wheels. The system also implements PI position control so the motors return to their commanded 
+positions after disturbances, while an LCD displays the current goal positions.
+
+#How to Run
+
+#Files

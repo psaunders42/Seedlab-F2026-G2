@@ -1,3 +1,10 @@
+// Tomas Padilla - EENG350 Team 2 F26 - Controls
+// Date: 10/04/2026
+// Purpose: Implements a PI controller for two motors on the robot to spin the wheels to their correct
+// locations given a input of a "quadrant region" from the CV scanner. Utilizes an anti-windup to prevent
+// overshoot upon start of wheel motion. 
+// Lines 108-133 are remnants from testing and should be removed/changed to agree with communication with the Pi
+
 // Motor control pins
 int enablePin = 4;
 int signPin[2] = {7,8};
@@ -98,7 +105,7 @@ void loop() {
   // time in seconds
   current_time = float(last_time_ms - start_time_ms) / 1000;
 
-  // --- Quadrant input (manual via Serial Monitor, or later from the Pi) ---
+  // Quadrant input testing via serial monitor
   if (Serial.available() > 0) {
     char quadrant = Serial.read();
     switch (quadrant) {
@@ -122,7 +129,6 @@ void loop() {
         desired_pos[1] = 0.0;
         Serial.println("SE -> L:1 R:0");
         break;
-      // ignore newline/carriage-return/other bytes
     }
   }
 

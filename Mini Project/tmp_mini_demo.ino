@@ -1,9 +1,10 @@
-// Tomas Padilla - EENG350 Team 2 F26 - Controls
+// Name: Tomas Padilla 
+// Class: EENG350 F26 Team 2 - Controls
 // Date: 10/04/2026
 // Purpose: Implements a PI controller for two motors on the robot to spin the wheels to their correct
 // locations given a input of a "quadrant region" from the CV scanner. Utilizes an anti-windup to prevent
 // overshoot upon start of wheel motion. 
-// Lines 108-133 are remnants from testing and should be removed/changed to agree with communication with the Pi
+// Lines 105-130 are remnants from testing and should be removed/changed to agree with communication with the Pi
 
 // Motor control pins
 int enablePin = 4;
@@ -41,16 +42,12 @@ float integral_error[2] = {0,0};
 float Kp_pos = 7;
 float Ki_pos = 0.2;
 float pos_error[2] = {0,0};
-//float actual_speed2 = 0;
 float Kp = 2;
 float base_PWM = 60;
 float Battery_Voltage = 7.8;
 float error[2] = {0,0};
-//float error2 = 0;
 float Voltage[2] = {0,0};
-//float Voltage2 = 0;
 unsigned int PWM[2] = {0,0};
-//unsigned int PWM2 = 0;
 
 void setup() {
   pinMode(enablePin, OUTPUT);

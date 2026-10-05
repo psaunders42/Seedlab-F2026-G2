@@ -2,11 +2,15 @@
 
 ##Project Description
 
-This project integrates a two-wheel motor control system with a computer vision interface using a Raspberry Pi and Arduino. 
-A camera detects the position of a visual marker within four image quadrants, and the marker location is used to command independent 
-target positions for the left and right wheels. The system also implements PI position control so the motors return to their commanded 
-positions after disturbances, while an LCD displays the current goal positions.
+# This project integrates a two-wheel motor control system with a computer vision interface using a Raspberry Pi and Arduino. 
+# A camera detects the position of a visual marker within four image quadrants, and the marker location is used to command independent 
+# target positions for the left and right wheels. The system also implements PI position control so the motors return to their commanded 
+# positions after disturbances, while an LCD displays the current goal positions.
 
 ##How to Run
+# To run this code, plug in the rasberryPI into the ardunio as awell as connect a mouse, powersource, and camera to the Pi (keyboard optional)
+# make sure both lights are green on the ardunio and PI by turning on the robot, this will include flipping the switch on the robot to 1
+# upload the Arduino code to the Ardunio by verifying it then pressing the upload button. 
+# once that is done press run in the Python code. Move around the ID
 
 ##Files

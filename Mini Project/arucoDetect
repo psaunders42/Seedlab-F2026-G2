@@ -5,6 +5,12 @@
 # Purpose: Creates a grid on the camera, 
 # detects what quadrant the ID is in, and communicates what quadrant the ID is in to the Arduino 
 #--------------------------------------------------------------------------
+#Hardware connections required
+#1. Everything should be connected to the pi
+#2. USb connection for arduino, and cameras
+#3. LCD should be connected over the pins in the middle of the pi as shown in a previous assignment
+#4. Make sure to have the correct libraries installed for the LCD and arduino
+#-----------------------------------------------------
 
 import cv2
 import cv2.aruco as aruco

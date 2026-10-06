@@ -14,3 +14,6 @@
 # once that is done press run in the Python code. Move around the ID
 
 ##Files
+#arucoDetect: Coding portion for the pi
+#arduinoCode: Coding portion of the arduino (with inigration of receiving pi info)
+#tmp_mini_demo.ino: Coding portion of the arduino (without pi intigration)

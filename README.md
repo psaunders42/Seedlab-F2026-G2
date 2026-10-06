@@ -1,7 +1,7 @@
 # SeedLab Group2
 
-Purpose
+## Purpose:
 This repository is dedicated for Seed Lab code and documents
 
-Organization
+## Organization
 - Mini Project/ → Contains all code and documentation for the mini project.

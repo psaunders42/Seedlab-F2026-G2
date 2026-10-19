@@ -6,6 +6,16 @@ A camera detects the position of a visual marker within four image quadrants, an
 target positions for the left and right wheels. The system also implements PI position control so the motors return to their commanded 
 positions after disturbances, while an LCD displays the current goal positions.
 
+## Hardware Initialization
+Ensure the camera module and Arduino communication cable are securely plugged into the Rasbeery Pi
+Toggle the main power switch on the robot to "1" which is "on"
+Verify the power indicator LEDs are illuminated on both the Arduino and Raspberry Pi
+
+## Microcontroller Deployment
+Open the Arduino IDE on the connected workstation or Pi
+Load the Arduino code and connect the board by selecting the correct board model and COM port
+Click Verify and Upload, then confirm that the onboard LCD initializes. 
+
 ## How to Run
 To run this code, plug in the rasberryPI into the ardunio as awell as connect a mouse, powersource, and camera to the Pi (keyboard optional)
 make sure both lights are green on the ardunio and PI by turning on the robot, this will include flipping the switch on the robot to 1

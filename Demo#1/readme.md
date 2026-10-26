@@ -9,13 +9,15 @@ detect the ArUco markers with as much accuracy as possible. Controls focuses on 
 Connect a camera to the Raspberry Pi as well as plug the Raspberry Pi into a monitor. Use "getImages_improved.py" to capture 20-30 images. These images contain a printed-out chessboard, taped to a flat surface, positioned in different places of the frame, at different angles & orientations; make sure to get all corners and edges. Then upload to "calibration_improved.py"; this will get the pictures from "getImages_improved.py" and use them to calculate the distortion and error. Do note: the lower the "px RMS" the better. You are encouraged to delete the ones greater than 1.0 or even 0.5 for best results. Continue the loop until you are happy with the overall error. This will return a camera matrix in the form of a plk file that "demo1_improved" will read and use these values to fix the distortion to the best of its ability. From there, firmly connect an LCD screen to the Pi and run the code. 
 
 ### Controls
-
+Connect the lithium ion battery to the voltage monitor, motor shield, and Arduino circuit combination, but keep the switch off. When the correctly updated Demo 1 Arduino code is uploaded to the Arduino via the USB connection, disconnect the USB and install a jumper cable between the Arduino VIN and Shield VOUT pins. It is critical to have no power provided to the Arduino via the barrel jack while this jumper is installed. After the code is uploaded and the jumper is installed, the switch that connects the battery to the circuit can be toggled and the robot will execute the movement defined in the code.
 
 
 ## How to Run
 ### CV
 Once following the initialization, you can run "demo1_improved.py." Upon running "demo1_improved.py" on the monitor, a screen should pop up, get an ArUcoMarker, and, to the best of your ability, find where zero is. This is done by moving or angling the camera around until the mointor/LCD are as close to zero as possible; it will be very hard to get it exactly on zero, so +/- 0.1 is okay. Then you are free to move around the arucMarker, and it will detect the angles away from what you zeroed. 
 
+### Controls
+In the Demo 1 Arduino code, update the two floating point variables, desired_rho and desired_phi, under the "Demo 1 position and angle variables" header (line 54). These two variables control the movement and navigation of the robot when the code is run. The variable desired_rho has units of inches and defines the straight-line distance that the robot will travel. The variable desired_phi has units of radians and defines the rotational position of the robot relative to the x-axis. After these two variables are set to match an appropriate test case, set the robot into motion by toggling the switch to provide power from the lithium ion battery. The robot will navigate by rotating first (if applicable) and then moving in a straight line. Afterwards, the robot will be settled at its final position.
 
 ## Files
 getImages_improved.py - used for collecting 20-30 images for calibration

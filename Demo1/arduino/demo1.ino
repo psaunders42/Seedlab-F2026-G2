@@ -1,10 +1,10 @@
-// Name: Tomas Padilla 
+// Name: Tomas Padilla, Travis C. Plumb
 // Class: EENG350 F26 Team 2 - Controls
 // Date: 10/04/2026
 // Purpose: Implements a PI controller for two motors on the robot to spin the wheels to their correct
 // locations given a input of a "quadrant region" from the CV scanner. Utilizes an anti-windup to prevent
 // overshoot upon start of wheel motion.
-
+#include <Arduino.h>
 #include <math.h>
 
 // Motor control pins
@@ -52,8 +52,26 @@ float Voltage[2] = {0,0};
 unsigned int PWM[2] = {0,0};
 
 // Demo 1 position and angle variables
+/*
+//Test 1
+float desired_rho = 108; // inches
+float desired_phi = 0; // radians
+*/
+/*
+//Test 2
+float desired_rho = 76.367; // inches
+float desired_phi = PI/4; // radians
+*/
+
+//Test 3
 float desired_rho = 12; // inches
-float desired_phi = PI/2; // radians
+float desired_phi = PI; // radians
+
+
+// Trim adjustments for uneven wheel movement
+float right_trim = 1.013;
+float left_trim = 1.023;
+float turn_trim = 0.995;
 
 // Robot measureables
 const float wheel_radius = 3.0; // inches
@@ -92,152 +110,6 @@ const float SPEED_TOL_RAD_S = 0.25;
 const int SETTLE_SAMPLES = 10;
 
 int settled_samples = 0;
-
-void setup() {
-  pinMode(enablePin, OUTPUT);
-  pinMode(signPin[0], OUTPUT);
-  pinMode(signPin[1], OUTPUT);
-  pinMode(pwmPin[0], OUTPUT);
-  pinMode(pwmPin[1], OUTPUT);
-
-  digitalWrite(enablePin, HIGH);
-  digitalWrite(signPin[0], HIGH);
-  digitalWrite(signPin[1], HIGH);
-
-  // establish 115200 baud rate
-  Serial.begin(115200);
-
-  pinMode(Apin, INPUT_PULLUP);
-  pinMode(Bpin, INPUT_PULLUP);
-  pinMode(Cpin, INPUT_PULLUP);
-  pinMode(Dpin, INPUT_PULLUP);
-
-  attachInterrupt(digitalPinToInterrupt(Apin), encoder1ISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(Cpin), encoder2ISR, CHANGE);
-
-  // Establish initial speed measurement baseline
-  prev_pos1_counts = MyEnc();
-  prev_pos2_counts = MyEnc2();
-
-  last_time_ms = millis();
-  start_time_ms = last_time_ms;
-}
-
-void loop() {
-  unsigned long now = millis();
-
-  // 10 ms control period
-  if (now - last_time_ms < desired_Ts_ms) {
-    return;
-  }
-
-  float dt = (now - last_time_ms) / 1000.0;
-  last_time_ms = now;
-
-  // Read encoder positions
-  long pos1_counts = MyEnc();
-  long pos2_counts = MyEnc2();
-
-  // Convert counts to wheel angles
-  actual_pos[0] = 2.0 * PI * (float)pos1_counts / COUNTS_PER_REV;
-  actual_pos[1] = 2.0 * PI * (float)pos2_counts / COUNTS_PER_REV;
-
-  // Calculate wheel speeds using actual elapsed time
-  actual_speed[0] = 2.0 * PI * (pos1_counts - prev_pos1_counts) / (COUNTS_PER_REV * dt);
-
-  actual_speed[1] = 2.0 * PI * (pos2_counts - prev_pos2_counts) / (COUNTS_PER_REV * dt);
-
-  prev_pos1_counts = pos1_counts;
-  prev_pos2_counts = pos2_counts;
-
-  // estimating robot pose from incremental wheel motion
-  updateOdometry();
-
-  // Update the navigation command
-  updateNavigation();
-
-  // stop after the done with motion
-  if (nav_state == NAV_DONE) {
-    analogWrite(pwmPin[0], 0);
-    analogWrite(pwmPin[1], 0);
-
-    if (!result_reported) {
-      result_reported = true;
-
-      Serial.print("Estimated final x: ");
-      Serial.println(robot_x, 3);
-
-      Serial.print("Estimated final y: ");
-      Serial.println(robot_y, 3);
-
-      Serial.print("Estimated final heading: ");
-      Serial.println(robot_phi, 4);
-
-      float ex = target_x - robot_x;
-      float ey = target_y - robot_y;
-
-      Serial.print("Odometry target error: ");
-      Serial.println(sqrt(ex * ex + ey * ey), 3);
-    }
-
-    return;
-  }
-
-  // mini project existing nested wheel controllers
-  for (int i = 0; i < 2; i++) {
-    pos_error[i] = desired_pos[i] - actual_pos[i];
-
-    integral_error[i] += pos_error[i] * dt;
-
-    // Position-loop anti-windup
-    if (integral_error[i] > 2.0) {
-      integral_error[i] = 2.0;
-    }
-
-    if (integral_error[i] < -2.0) {
-      integral_error[i] = -2.0;
-    }
-
-    desired_speed[i] = Kp_pos * pos_error[i] + Ki_pos * integral_error[i];
-
-    const float MAX_WHEEL_SPEED = 4.0; // rad/s
-
-    if (desired_speed[i] > MAX_WHEEL_SPEED) {
-      desired_speed[i] = MAX_WHEEL_SPEED;
-    }
-
-    if (desired_speed[i] < -MAX_WHEEL_SPEED) {
-      desired_speed[i] = -MAX_WHEEL_SPEED;
-    }
-
-    error[i] = desired_speed[i] - actual_speed[i];
-
-    Voltage[i] = Kp * error[i];
-
-    // Limit requested voltage to the available supply
-    if (Voltage[i] > Battery_Voltage) {
-      Voltage[i] = Battery_Voltage;
-    }
-
-    if (Voltage[i] < -Battery_Voltage) {
-      Voltage[i] = -Battery_Voltage;
-    }
-
-    if (Voltage[i] >= 0.0) {
-      digitalWrite(signPin[i], HIGH);
-    } else {
-      digitalWrite(signPin[i], LOW);
-    }
-
-    PWM[i] = (unsigned int)(255.0 * fabs(Voltage[i]) / Battery_Voltage);
-
-    if (PWM[i] > 255) {
-      PWM[i] = 255;
-    }
-
-    analogWrite(pwmPin[i], PWM[i]);
-  }
-}
 
 // angle wrapping helper, keeps angle between [-pi,+pi].
 float wrapAngle(float angle) {
@@ -302,7 +174,7 @@ void updateNavigation() {
 
     // Wheel-angle changes for an in-place turn
     float dthetaR =
-        (wheel_base * turn_angle) / (2.0 * wheel_radius);
+        turn_trim * (wheel_base * turn_angle) / (2.0 * wheel_radius);
 
     float dthetaL = -dthetaR;
 
@@ -341,10 +213,10 @@ void updateNavigation() {
       if (nav_state == NAV_TURN) {
         // Begin straight-line drive from current wheel positions
         desired_pos[RIGHT_IDX] =
-            actual_pos[RIGHT_IDX] + desired_rho / wheel_radius;
+            actual_pos[RIGHT_IDX] + right_trim * desired_rho / wheel_radius;
 
         desired_pos[LEFT_IDX] =
-            actual_pos[LEFT_IDX] + desired_rho / wheel_radius;
+            actual_pos[LEFT_IDX] + left_trim * desired_rho / wheel_radius;
 
         settled_samples = 0;
 
@@ -423,3 +295,155 @@ long MyEnc2(){
 
   return count;
 }
+
+
+void setup() {
+  pinMode(enablePin, OUTPUT);
+  pinMode(signPin[0], OUTPUT);
+  pinMode(signPin[1], OUTPUT);
+  pinMode(pwmPin[0], OUTPUT);
+  pinMode(pwmPin[1], OUTPUT);
+
+  digitalWrite(enablePin, HIGH);
+  digitalWrite(signPin[0], HIGH);
+  digitalWrite(signPin[1], HIGH);
+
+  // establish 115200 baud rate
+  Serial.begin(115200);
+
+  pinMode(Apin, INPUT_PULLUP);
+  pinMode(Bpin, INPUT_PULLUP);
+  pinMode(Cpin, INPUT_PULLUP);
+  pinMode(Dpin, INPUT_PULLUP);
+
+  attachInterrupt(digitalPinToInterrupt(Apin), encoder1ISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Cpin), encoder2ISR, CHANGE);
+
+  // Establish initial speed measurement baseline
+  prev_pos1_counts = MyEnc();
+  prev_pos2_counts = MyEnc2();
+
+  delay(10000);
+
+  last_time_ms = millis();
+  start_time_ms = last_time_ms;
+}
+
+
+void loop() {
+  unsigned long now = millis();
+
+  // 10 ms control period
+  if (now - last_time_ms < desired_Ts_ms) {
+    return;
+  }
+
+  float dt = (now - last_time_ms) / 1000.0;
+  last_time_ms = now;
+
+  // Read encoder positions
+  long pos1_counts = MyEnc();
+  long pos2_counts = MyEnc2();
+
+  // Convert counts to wheel angles
+  actual_pos[0] = 2.0 * PI * (float)pos1_counts / COUNTS_PER_REV;
+  actual_pos[1] = 2.0 * PI * (float)pos2_counts / COUNTS_PER_REV;
+
+  // Calculate wheel speeds using actual elapsed time
+  actual_speed[0] = 2.0 * PI * (pos1_counts - prev_pos1_counts) / (COUNTS_PER_REV * dt);
+
+  actual_speed[1] = 2.0 * PI * (pos2_counts - prev_pos2_counts) / (COUNTS_PER_REV * dt);
+
+  prev_pos1_counts = pos1_counts;
+  prev_pos2_counts = pos2_counts;
+
+  // estimating robot pose from incremental wheel motion
+  updateOdometry();
+
+  // Update the navigation command
+  updateNavigation();
+
+  // stop after the done with motion
+  if (nav_state == NAV_DONE) {
+    analogWrite(pwmPin[0], 0);
+    analogWrite(pwmPin[1], 0);
+
+    if (!result_reported) {
+      result_reported = true;
+
+      Serial.print("Estimated final x: ");
+      Serial.println(robot_x, 3);
+
+      Serial.print("Estimated final y: ");
+      Serial.println(robot_y, 3);
+
+      Serial.print("Estimated final heading: ");
+      Serial.println(robot_phi, 4);
+
+      float ex = target_x - robot_x;
+      float ey = target_y - robot_y;
+
+      Serial.print("Odometry target error: ");
+      Serial.println(sqrt(ex * ex + ey * ey), 3);
+    }
+
+    return;
+  }
+
+  // mini project existing nested wheel controllers
+  for (int i = 0; i < 2; i++) {
+    pos_error[i] = desired_pos[i] - actual_pos[i];
+
+    integral_error[i] += pos_error[i] * dt;
+
+    // Position-loop anti-windup
+    if (integral_error[i] > 2.0) {
+      integral_error[i] = 2.0;
+    }
+
+    if (integral_error[i] < -2.0) {
+      integral_error[i] = -2.0;
+    }
+
+    desired_speed[i] = Kp_pos * pos_error[i] + Ki_pos * integral_error[i];
+
+    const float MAX_WHEEL_SPEED = (nav_state == NAV_TURN) ? 1.5 : 3.0;
+
+    if (desired_speed[i] > MAX_WHEEL_SPEED) {
+      desired_speed[i] = MAX_WHEEL_SPEED;
+    }
+
+    if (desired_speed[i] < -MAX_WHEEL_SPEED) {
+      desired_speed[i] = -MAX_WHEEL_SPEED;
+    }
+
+    error[i] = desired_speed[i] - actual_speed[i];
+
+    Voltage[i] = Kp * error[i];
+
+    // Limit requested voltage to the available supply
+    if (Voltage[i] > Battery_Voltage) {
+      Voltage[i] = Battery_Voltage;
+    }
+
+    if (Voltage[i] < -Battery_Voltage) {
+      Voltage[i] = -Battery_Voltage;
+    }
+
+    if (Voltage[i] >= 0.0) {
+      digitalWrite(signPin[i], HIGH);
+    } else {
+      digitalWrite(signPin[i], LOW);
+    }
+
+    PWM[i] = (unsigned int)(255.0 * fabs(Voltage[i]) / Battery_Voltage);
+
+    if (PWM[i] > 255) {
+      PWM[i] = 255;
+    }
+
+    analogWrite(pwmPin[i], PWM[i]);
+  }
+}
+
+

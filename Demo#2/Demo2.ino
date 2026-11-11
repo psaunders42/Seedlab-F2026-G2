@@ -124,6 +124,7 @@ const float DRIVE_MAX_WHEEL_SPEED = 3.0; // wheel speed limit for driving and st
 const float MAX_WHEEL_ACCEL = 12.0; // how fast wheel speed can increase in position mode
 const float K_SYNC = 2.0; // keeps the wheels together in position mode
 const float SPEED_FF_V_PER_RAD_S = 0.0; // PLACEHOLDER: 1/K from motor model, 0 = off
+const int SEARCH_DIR = 1;
 
 // completion conditions, a position move is done when both wheels are within these
 const float POS_TOL_RAD = 0.04;

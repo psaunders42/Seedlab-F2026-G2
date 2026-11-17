@@ -8,7 +8,7 @@ data sent.
 
 ## Hardware Initialization
 ### CV
-~from demo 1 continues over~ go back to demo 1 if need to calibrate camera
+~from demo 1 continues over go back to demo 1 if need to calibrate camera
 Connect a camera to the Raspberry Pi and plug the Raspberry Pi into a monitor. 
 Use "getImages_improved.py" to capture 20-30 images. These images contain a printed-out chessboard, 
 taped to a flat surface, positioned in different places of the frame, at different angles & orientations; 
@@ -19,7 +19,7 @@ Continue the loop until you are happy with the overall error. This will return a
 "demo1_improved" will read and use these values to fix the distortion to the best of its ability. From there, 
 firmly connect an LCD screen to the Pi and run the code. 
 
-~New~
+~New
 Rest the PI somewhere on the robot where it is secure. Connect the Arduino to the PI thru using a USB-A to USB-C. And connect the PI 
 to a power source that is portable, like a portable battery. 
 

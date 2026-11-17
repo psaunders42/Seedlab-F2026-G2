@@ -5,5 +5,5 @@ This repository is dedicated for Seed Lab code and documents
 
 ## Organization
 - Mini Project/ → Contains all code and documentation for the mini project.
-- Demo1/ → Contains all code and documentation for the demo1.
-- Demo2/ → Contains all code and documentation for the demo2.
+- Demo#1/ → Contains all code and documentation for the demo1.
+- Demo#2/ → Contains all code and documentation for the demo2.

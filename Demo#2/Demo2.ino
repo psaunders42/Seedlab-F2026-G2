@@ -1,4 +1,4 @@
-//Travis Plumb + Thomas Saunders
+//Travis Plumb + Tomas Padilla
 //Demo 2 Code
 
 #include <Arduino.h>
